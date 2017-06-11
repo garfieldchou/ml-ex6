@@ -22,12 +22,31 @@ sigma = 0.3;
 %  Note: You can compute the prediction error using 
 %        mean(double(predictions ~= yval))
 %
+C_cand = [0.01; 0.03; 0.1; 0.3; 1; 3; 10; 30];
+sigma_cand = [0.01; 0.03; 0.1; 0.3; 1; 3; 10; 30];
+predErrMin = 1;
 
+for i = 1:size(C_cand)
 
+    for j = 1:size(sigma_cand)
+    
+        fprintf(['Train model with C=%f, sigma=%f\n'], C_cand(i), sigma_cand(j));
+    
+        model= svmTrain(X, y, C_cand(i), @(x1, x2) gaussianKernel(x1, x2, sigma_cand(j)));
+        predictions = svmPredict(model, Xval);
+        predErr = mean(double(predictions ~= yval));
+        
+        if predErr < predErrMin
+            C= C_cand(i);
+            sigma= sigma_cand(j);
+            predErrMin = predErr;
+        end
+        
+        fprintf(['Current C=%f, sigma=%f\n'], C, sigma);
+        
+    end
 
-
-
-
+end
 
 % =========================================================================
 
